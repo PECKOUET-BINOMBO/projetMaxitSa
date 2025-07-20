@@ -193,12 +193,14 @@ if (isset($success_message)) {
                 </label>
                 <div class="relative">
                     <input type="number"
-                        id="montant-initial"
-                        name="montant_initial"
-                        min="0"
-                        step="0.01"
-                        placeholder="0.00"
-                        class="w-full px-3 py-2 pr-12 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent">
+    id="montant-initial"
+    name="montant_initial"
+    min="0"
+    max="<?= isset($solde) ? $solde : 0 ?>"
+    step="0.01"
+    placeholder="0.00"
+    class="w-full px-3 py-2 pr-12 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+    oninput="checkSolde(this)">
                     <span class="absolute right-3 top-2 text-gray-500">CFA</span>
                 </div>
                 <p class="text-xs text-gray-500 mt-1">Laissez vide pour créer un compte avec un solde de 0 CFA</p>
@@ -297,4 +299,15 @@ if (isset($success_message)) {
             closeAddAccountModal();
         }
     });
+
+    function checkSolde(input) {
+    const soldePrincipal = <?= isset($solde) ? $solde : 0 ?>;
+    const montant = parseFloat(input.value) || 0;
+    
+    if (montant > soldePrincipal) {
+        alert('Le montant ne peut pas dépasser votre solde principal de ' + soldePrincipal + ' CFA');
+        input.value = soldePrincipal;
+    }
+}
+
 </script>

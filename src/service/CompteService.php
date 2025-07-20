@@ -54,6 +54,33 @@ public function addCompteSecondaire(int $userId, string $telephone, float $monta
     }
 
     try {
+        // Démarrer une transaction
+        $this->compteRepository->beginTransaction();
+
+        // Si un montant est spécifié, déduire du compte principal
+        if ($montantInitial > 0) {
+            // 1. Trouver le compte principal
+            $comptePrincipal = $this->compteRepository->findBy([
+                'client_id' => $userId,
+                'type' => 'Principal'
+            ])[0] ?? null;
+
+            if (!$comptePrincipal) {
+                throw new \Exception('Compte principal non trouvé');
+            }
+
+            // 2. Vérifier le solde
+            if ($comptePrincipal['solde'] < $montantInitial) {
+                throw new \Exception('Solde insuffisant sur le compte principal');
+            }
+
+            // 3. Mettre à jour le solde du compte principal
+            $this->compteRepository->updateSolde(
+                $comptePrincipal['id'],
+                $comptePrincipal['solde'] - $montantInitial
+            );
+        }
+
         // Créer le compte secondaire
         $success = $this->compteRepository->addCompteSecondaire(
             $userId, 
@@ -61,14 +88,20 @@ public function addCompteSecondaire(int $userId, string $telephone, float $monta
             'Secondaire',
             $montantInitial
         );
-        
-        if ($success) {
-            return ['success' => true, 'message' => 'Compte secondaire créé avec succès'];
+
+        if (!$success) {
+            throw new \Exception('Erreur lors de la création du compte');
         }
+
+        // Valider la transaction
+        $this->compteRepository->commitTransaction();
+
+        return ['success' => true, 'message' => 'Compte secondaire créé avec succès'];
         
-        return ['success' => false, 'message' => 'Erreur lors de la création du compte'];
     } catch (\Exception $e) {
-        return ['success' => false, 'message' => 'Erreur technique: ' . $e->getMessage()];
+        // Annuler en cas d'erreur
+        $this->compteRepository->rollbackTransaction();
+        return ['success' => false, 'message' => 'Erreur: ' . $e->getMessage()];
     }
 }
 

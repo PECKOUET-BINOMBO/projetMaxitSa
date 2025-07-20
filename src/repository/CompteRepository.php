@@ -132,5 +132,29 @@ public function findBy(array $criteria): array
     
     return $stmt->fetchAll(\PDO::FETCH_ASSOC);
 }
+
+public function beginTransaction(): void
+{
+    $this->pdo->beginTransaction();
+}
+
+public function commitTransaction(): void
+{
+    $this->pdo->commit();
+}
+
+public function rollbackTransaction(): void
+{
+    $this->pdo->rollBack();
+}
+
+public function updateSolde(int $compteId, float $nouveauSolde): bool
+{
+    $query = "UPDATE compte SET solde = :solde WHERE id = :id";
+    $stmt = $this->pdo->prepare($query);
+    $stmt->bindParam(':solde', $nouveauSolde);
+    $stmt->bindParam(':id', $compteId, \PDO::PARAM_INT);
+    return $stmt->execute();
+}
     
 }

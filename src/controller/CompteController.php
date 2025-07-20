@@ -32,31 +32,41 @@ class CompteController extends AbstractController
 
     // CompteController.php
 
-    public function ajoutCompteSecondaire()
-    {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $user = $this->session->get('user');
-            $userId = $user->getId(); // Supposons que l'ID utilisateur est en session
-            $telephone = $_POST['telephone'] ?? '';
-            $montantInitial = (float)($_POST['montant_initial'] ?? 0);
+   public function ajoutCompteSecondaire()
+{
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $user = $this->session->get('user');
+        $userId = $user->getId();
+        $telephone = $_POST['telephone'] ?? '';
+        $montantInitial = (float)($_POST['montant_initial'] ?? 0);
 
+        // Nettoyer le numéro de téléphone
+        $telephone = preg_replace('/\D/', '', $telephone);
 
-            // Nettoyer le numéro de téléphone (supprimer les espaces, etc.)
-            $telephone = preg_replace('/\D/', '', $telephone);
-
-            $result = $this->compteService->addCompteSecondaire($userId, $telephone, $montantInitial);
-
-            if ($result['success']) {
-                $this->session->set('success_message', 'Compte secondaire ajouté avec succès.');
-                header('Location: /dashboardClient');
-                exit();
-            } else {
-                $this->session->set('error_message', $result['message']);
+        // Vérifier si un montant a été saisi
+        if ($montantInitial > 0) {
+            // Vérifier si le compte principal a suffisamment de solde
+            $soldePrincipal = $this->compteService->getSoldeById($userId);
+            
+            if ($soldePrincipal < $montantInitial) {
+                $this->session->set('error_message', 'Solde insuffisant sur le compte principal.');
                 header('Location: /dashboardClient');
                 exit();
             }
         }
+
+        $result = $this->compteService->addCompteSecondaire($userId, $telephone, $montantInitial);
+
+        if ($result['success']) {
+            $this->session->set('success_message', 'Compte secondaire ajouté avec succès.');
+        } else {
+            $this->session->set('error_message', $result['message']);
+        }
+        
+        header('Location: /dashboardClient');
+        exit();
     }
+}
 
   public function setPrimaryAccount()
 {
