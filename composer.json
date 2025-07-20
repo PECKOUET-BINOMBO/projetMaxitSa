@@ -1,0 +1,24 @@
+{
+    "name": "moustapha/reprendreleprojet",
+    "description": "Projet wane",
+    "autoload": {
+        "psr-4": {
+            "Moustapha\\Reprendreleprojet\\": "src/",
+            "App\\Src\\Entity\\": "src/entity/",
+            "App\\Src\\Repository\\": "src/repository/",
+            "App\\Src\\Controller\\": "src/controller/",
+            "App\\Src\\Service\\": "src/service/",
+            "App\\Core\\Abstract\\": "app/core/abstract/",
+            "App\\Core\\": "app/core/",
+            "App\\Core\\Middlewares\\": "app/core/middlewares/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Moustapha"
+        }
+    ],
+    "require": {
+        "vlucas/phpdotenv": "^5.6"
+    }
+}
