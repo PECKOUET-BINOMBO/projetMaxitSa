@@ -78,25 +78,35 @@ public function showAllTransactions()
     if (!$comptePrincipal) {
         $this->renderHTML('auth/all_transactions', [
             'user' => $user,
-            'transactions' => []
+            'transactions' => [],
+            'currentPage' => 1,
+            'totalPages' => 1
         ]);
         return;
     }
 
-    // Récupérer les paramètres de filtrage
+    // Récupérer les paramètres
     $type = $_GET['type'] ?? null;
     $date = $_GET['date'] ?? null;
+    $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+    $perPage = 10; // Nombre de transactions par page
 
-    // Récupérer les transactions filtrées
-    $transactions = $this->transactionService->getFilteredTransactions(
+    // Récupérer les transactions filtrées avec pagination
+    $result = $this->transactionService->getPaginatedTransactions(
         $comptePrincipal['id'],
         $type,
-        $date
+        $date,
+        $page,
+        $perPage
     );
 
     $this->renderHTML('auth/all_transactions', [
         'user' => $user,
-        'transactions' => $transactions
+        'transactions' => $result['transactions'],
+        'currentPage' => $page,
+        'totalPages' => $result['totalPages'],
+        'type' => $type,
+        'date' => $date
     ]);
 }
 }

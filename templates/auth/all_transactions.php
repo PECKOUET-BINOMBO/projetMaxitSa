@@ -92,3 +92,34 @@
         </div>
     <?php endif; ?>
 </div>
+
+<!-- Pagination -->
+<?php if ($totalPages > 1): ?>
+<div class="flex items-center justify-center mt-8">
+    <nav class="flex items-center space-x-2">
+        <!-- Lien vers la page précédente -->
+        <?php if ($currentPage > 1): ?>
+            <a href="?page=<?= $currentPage - 1 ?><?= isset($type) ? '&type=' . htmlspecialchars($type) : '' ?><?= isset($date) ? '&date=' . htmlspecialchars($date) : '' ?>"
+               class="px-3 py-1 rounded-lg border border-gray-300 hover:bg-gray-100">
+                &laquo; Précédent
+            </a>
+        <?php endif; ?>
+
+        <!-- Liens des pages -->
+        <?php for ($i = 1; $i <= $totalPages; $i++): ?>
+            <a href="?page=<?= $i ?><?= isset($type) ? '&type=' . htmlspecialchars($type) : '' ?><?= isset($date) ? '&date=' . htmlspecialchars($date) : '' ?>"
+               class="px-3 py-1 rounded-lg <?= $i == $currentPage ? 'bg-orange-500 text-white' : 'border border-gray-300 hover:bg-gray-100' ?>">
+                <?= $i ?>
+            </a>
+        <?php endfor; ?>
+
+        <!-- Lien vers la page suivante -->
+        <?php if ($currentPage < $totalPages): ?>
+            <a href="?page=<?= $currentPage + 1 ?><?= isset($type) ? '&type=' . htmlspecialchars($type) : '' ?><?= isset($date) ? '&date=' . htmlspecialchars($date) : '' ?>"
+               class="px-3 py-1 rounded-lg border border-gray-300 hover:bg-gray-100">
+                Suivant &raquo;
+            </a>
+        <?php endif; ?>
+    </nav>
+</div>
+<?php endif; ?>
